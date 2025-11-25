@@ -1,5 +1,6 @@
 'use client';
 
+import { registerUser } from '@/actions/register';
 import { Form, Input, Button } from '@heroui/react';
 import { useState } from 'react';
 
@@ -21,7 +22,12 @@ const RegistrationForm = ({ onClose }: IProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    // console.log('Form submitted:', formData);
+
+    // обращаемся к призме-клиенту для регистрации пользователя
+    const resultRegisteredUser = await registerUser(formData);
+    console.log(resultRegisteredUser);
+
     // закрываем моальное окно полсе регистрации
     onClose();
   };
@@ -70,7 +76,7 @@ const RegistrationForm = ({ onClose }: IProps) => {
         isRequired
         name="confirmPassword"
         placeholder="Введіть пароль"
-        type="confirmPassword"
+        type="password"
         value={formData.confirmPassword}
         onChange={(e) =>
           setFormData({ ...formData, confirmPassword: e.target.value })
