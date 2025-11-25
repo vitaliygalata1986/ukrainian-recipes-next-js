@@ -1,5 +1,6 @@
 'use client';
 
+import { layoutConfig } from '@/config/layout.config';
 import { siteConfig } from '@/config/site.config';
 import {
   Navbar,
@@ -8,10 +9,12 @@ import {
   NavbarItem,
   Button,
 } from '@heroui/react';
-import { i } from 'framer-motion/client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import RegistrationModal from '../modals/registration.modal';
+import { useState } from 'react';
+import LoginModal from '../modals/login.modal';
 
 export const AcmeLogo = () => {
   return (
@@ -26,6 +29,8 @@ export const AcmeLogo = () => {
 };
 
 export default function Header() {
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const pathname = usePathname(); // http://localhost:3000/ingredients -> /ingredients
   // console.log(pathname);
 
@@ -55,7 +60,10 @@ export default function Header() {
   };
 
   return (
-    <Navbar className="bg-black text-white">
+    <Navbar
+      className="bg-black text-white"
+      style={{ height: layoutConfig.headerHeight }}
+    >
       <NavbarBrand>
         <Link href="/" className="flex gap-1 text-white">
           <AcmeLogo />
@@ -69,14 +77,33 @@ export default function Header() {
 
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
-          <Link href="#">Логин</Link>
+          <Button
+            as={Link}
+            color="primary"
+            href="#"
+            variant="flat"
+            onPress={() => setIsLoginOpen(true)}
+          >
+            Логін
+          </Button>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} color="primary" href="#" variant="flat">
-            Регистрация
+          <Button
+            as={Link}
+            color="primary"
+            href="#"
+            variant="flat"
+            onPress={() => setIsRegistrationOpen(true)}
+          >
+            Реєстрація
           </Button>
         </NavbarItem>
       </NavbarContent>
+      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      <RegistrationModal
+        isOpen={isRegistrationOpen}
+        onClose={() => setIsRegistrationOpen(false)}
+      />
     </Navbar>
   );
 }
