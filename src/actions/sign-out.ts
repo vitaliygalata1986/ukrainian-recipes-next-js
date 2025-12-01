@@ -1,3 +1,5 @@
+'use server';
+
 import { signOut } from '@/auth/auth';
 
 export async function signOutFunc() {
@@ -8,5 +10,5 @@ export async function signOutFunc() {
   } catch (error) {
     console.error('Error signing out user:', error);
     throw error;
-  } 
+  }
 }

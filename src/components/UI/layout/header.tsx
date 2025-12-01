@@ -15,6 +15,8 @@ import { usePathname } from 'next/navigation';
 import RegistrationModal from '../modals/registration.modal';
 import { useState } from 'react';
 import LoginModal from '../modals/login.modal';
+import { signOutFunc } from '@/actions/sign-out';
+import { useSession } from 'next-auth/react';
 
 export const AcmeLogo = () => {
   return (
@@ -33,6 +35,18 @@ export default function Header() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const pathname = usePathname(); // http://localhost:3000/ingredients -> /ingredients
   // console.log(pathname);
+
+  const { data: session, status } = useSession();
+
+  // проверим статус сессии
+  const isAuth = status === 'authenticated';
+
+  console.log('session', session); // null
+  console.log('status', status); // 'unauthenticated' or 'authenticated'
+
+  const handleSignOut = async () => {
+    await signOutFunc();
+  };
 
   const getNavItems = () => {
     {
@@ -76,29 +90,48 @@ export default function Header() {
       </NavbarContent>
 
       <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
-          <Button
-            as={Link}
-            color="primary"
-            href="#"
-            variant="flat"
-            onPress={() => setIsLoginOpen(true)}
-          >
-            Логін
-          </Button>
-        </NavbarItem>
-        <NavbarItem>
-          <Button
-            as={Link}
-            color="primary"
-            href="#"
-            variant="flat"
-            onPress={() => setIsRegistrationOpen(true)}
-          >
-            Реєстрація
-          </Button>
-        </NavbarItem>
+        {isAuth && <p>Привiт, {session?.user?.email}</p>}
+        {!isAuth ? (
+          <>
+            <NavbarItem className="hidden lg:flex">
+              <Button
+                as={Link}
+                color="primary"
+                href="#"
+                variant="flat"
+                onPress={() => setIsLoginOpen(true)}
+              >
+                Логін
+              </Button>
+            </NavbarItem>
+
+            <NavbarItem>
+              <Button
+                as={Link}
+                color="primary"
+                href="#"
+                variant="flat"
+                onPress={() => setIsRegistrationOpen(true)}
+              >
+                Реєстрація
+              </Button>
+            </NavbarItem>
+          </>
+        ) : (
+          <NavbarItem className="hidden lg:flex">
+            <Button
+              as={Link}
+              color="primary"
+              href="#"
+              variant="flat"
+              onPress={handleSignOut}
+            >
+              Вийти
+            </Button>
+          </NavbarItem>
+        )}
       </NavbarContent>
+
       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
       <RegistrationModal
         isOpen={isRegistrationOpen}
