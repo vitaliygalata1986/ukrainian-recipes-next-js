@@ -16,7 +16,7 @@ import RegistrationModal from '../modals/registration.modal';
 import { useState } from 'react';
 import LoginModal from '../modals/login.modal';
 import { signOutFunc } from '@/actions/sign-out';
-import { useSession } from 'next-auth/react';
+import { useAuthStore } from '@/store/auth.store';
 
 export const AcmeLogo = () => {
   return (
@@ -36,16 +36,22 @@ export default function Header() {
   const pathname = usePathname(); // http://localhost:3000/ingredients -> /ingredients
   // console.log(pathname);
 
-  const { data: session, status } = useSession();
+  const { isAuth, session, status, setAuthState } = useAuthStore();
 
   // проверим статус сессии
-  const isAuth = status === 'authenticated';
+  // const isAuth = status === 'authenticated';
 
-  console.log('session', session); // null
-  console.log('status', status); // 'unauthenticated' or 'authenticated'
+  // console.log('session', session); // null
+  // console.log('status', status); // 'unauthenticated' or 'authenticated'
 
   const handleSignOut = async () => {
-    await signOutFunc();
+    try {
+      await signOutFunc();
+    } catch (error) {
+      console.log('error', error);
+    }
+
+    setAuthState('unauthenticated', null); // тоесть при выходе убираем сессию и устанавливаем статус unauthenticated
   };
 
   const getNavItems = () => {
@@ -57,12 +63,11 @@ export default function Header() {
             <Link
               color="foreground"
               href={item.href}
-              className={`px-3 py-1  ${
-                isActive ? 'text-blue-500' : 'text-white'
-              }
+              className={`px-3 py-1  
+                ${isActive ? 'text-blue-500' : 'text-white'}
                hover:text-blue-300 hover:border
                hover:border-blue-300 rounded-md
-               transition-all duration-200
+                 transition-all duration-200
                 `}
             >
               {item.label}
@@ -91,7 +96,9 @@ export default function Header() {
 
       <NavbarContent justify="end">
         {isAuth && <p>Привiт, {session?.user?.email}</p>}
-        {!isAuth ? (
+        {status === 'loading' ? (
+          <p>Loading...</p>
+        ) : !isAuth ? (
           <>
             <NavbarItem className="hidden lg:flex">
               <Button

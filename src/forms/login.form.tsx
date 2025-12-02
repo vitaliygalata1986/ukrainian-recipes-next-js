@@ -17,13 +17,12 @@ const LoginForm = ({ onClose }: IProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    // console.log('Form submitted:', formData);
 
-    const result = await signInWithCredentials(
-      formData.email,
-      formData.password
-    );
-    console.log(result);
+    await signInWithCredentials(formData.email, formData.password);
+    
+    window.location.reload();
+
     // закрываем моальное окно полсе регистрации
     onClose();
   };
