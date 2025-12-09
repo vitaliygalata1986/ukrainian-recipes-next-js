@@ -1,25 +1,41 @@
 'use client';
 
 import { useState } from 'react';
-import { Form, Input, Select, SelectItem, Button } from '@heroui/react';
+import { Input, Select, SelectItem, Button, Form } from '@heroui/react'; // Form убрали
 import { CATEGORY_OPTIONS, UNIT_OPTIONS } from '@/constants/select-options';
+import { createIngredint } from '@/actions/ingredient';
+
+const initialState = {
+  name: '',
+  category: '',
+  unit: '',
+  pricePerUnit: null as number | null,
+  description: '',
+};
 
 const IngredientForm = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    category: '',
-    unit: '',
-    pricePerUnit: null as number | null,
-    description: '',
-  });
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState(initialState);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
+  const handleSubmit = async (formData: FormData) => {
+    const result = await createIngredint(formData);
+    // formData здесь — не наш локальный стейт,
+    // а объект FormData, который собрал HeroUI Form из всех полей (name="...").
+    // Мы просто прокидываем его в server action createIngredint.
+
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setError(null);
+      // После успешного сохранения очищаем локальное состояние,
+      // чтобы сбросить значения инпутов в UI.
+      setFormData(initialState);
+    }
   };
 
   return (
-    <Form className="w-[400px]" onSubmit={handleSubmit}>
+    <Form className="w-[400px]" action={handleSubmit}>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
       <Input
         isRequired
         aria-label="Name"
@@ -37,6 +53,7 @@ const IngredientForm = () => {
           return null;
         }}
       />
+
       <div className="flex gap-2 w-full">
         <div className="w-1/3">
           <Select
@@ -48,7 +65,7 @@ const IngredientForm = () => {
             classNames={{
               trigger: 'bg-default-100 w-full',
               innerWrapper: 'text-sm',
-              value: 'text-sm',
+              value: 'truncate',
               selectorIcon: 'text-black',
             }}
             onChange={(e) =>
@@ -62,6 +79,7 @@ const IngredientForm = () => {
             ))}
           </Select>
         </div>
+
         <div className="w-1/3">
           <Select
             isRequired
@@ -72,7 +90,7 @@ const IngredientForm = () => {
             classNames={{
               trigger: 'bg-default-100 w-full',
               innerWrapper: 'text-sm',
-              value: 'text-sm',
+              value: 'truncate',
               selectorIcon: 'text-black',
             }}
             onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
@@ -84,6 +102,7 @@ const IngredientForm = () => {
             ))}
           </Select>
         </div>
+
         <div className="w-1/3">
           <Input
             isRequired
@@ -133,6 +152,7 @@ const IngredientForm = () => {
           input: 'text-sm focus:outline-none',
         }}
       />
+
       <div className="flex w-full justify-end items-center">
         <Button className="primary" type="submit">
           Додати інгредієнт
@@ -144,23 +164,54 @@ const IngredientForm = () => {
 
 export default IngredientForm;
 
-// name - название ингредиента
-// category - категория ингредиента
-// unit - единица измерения
-// pricePerUnit - цена за единицу здесь мы явно указываем TS что pricePerUnit может быть number, когда цена введена, или null когда оно пустое
-// без этого TS могбы определить тип any как null
-// description - описание
+// name         – название ингредиента (строка, обязательное поле).
+// category     – категория ингредиента; в БД это enum Category.
+// unit         – единица измерения; в БД это enum Unit.
+// pricePerUnit – цена за одну единицу (number | null).
+// description  – описание ингредиента (опциональное поле).
 
 /*
-  selectedKeys в <Select> — это проп, который говорит компоненту: «какие элементы сейчас выбраны».
-  По сути это аналог value у обычного <select>, только в виде набора ключей.
+    Form из @heroui/react — это обёртка над обычным HTML-формом (<form>).
+    Он поддерживает 2 способа работы:
+    1) onSubmit={(e) => ...} — классический React:
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      const formData = new FormData(e.currentTarget as HTMLFormElement);
+      ...
+    };
+    2) action={(formData: FormData) => ...} — удобный шорткат:
+    HeroUI внутри сам делает:
+      const formData = new FormData(event.currentTarget);
+      props.action?.(formData);
+    То есть, вместо того чтобы ловить event, делать new FormData(...) и париться,
+    ты сразу получаешь готовый FormData объект.
+    action — это колбэк, который получает FormData.
 
-  У каждого <SelectItem> есть key={option.value}.
-  Проп selectedKeys принимает список (на самом деле Iterable) этих ключей.
-  Когда в formData.category есть значение (например "meat"), ты передаёшь ["meat"] → селект показывает, что пункт с key="meat" выбран.
-  Когда formData.category пустой, ты передаёшь [] → ничего не выбрано, показывается placeholder.
+    2. Почему сигнатура именно (formData: FormData)
+      Потому что HeroUI уже:
+        перехватил submit,
+        сделал preventDefault() за тебя,
+        собрал все поля по name="..." в FormData.
 
-  То есть:
-    selectedKeys делает компонент контролируемым: выбранное значение полностью определяется состоянием formData.category.
-    При изменении выбора в onChange ты сохраняешь новый category в formData, и в следующий рендер selectedKeys уже содержит новый ключ → Select перерисовывается с новым выбранным значением.
+        const handleSubmit = async (formData: FormData) => {
+          await createIngredint(formData);
+        };
+
+      4. Связка с серверным действием (createIngredint)
+        Сейчас у тебя схема такая:
+        Form (HeroUI) в клиентском компоненте собирает FormData и вызывает твой handleSubmit.
+        В handleSubmit ты вызываешь server action createIngredint(formData) — Next.js сам сделает запрос на сервер, выполнит код на сервере, и вернёт результат.
+        То есть цепочка: поля формы → FormData → handleSubmit → createIngredint (на сервере)
 */
+
+// В Next.js 15 можно передавать server actions напрямую в action формы,
+// и они будут вызываться на сервере с тем же FormData.
+// В нашем случае мы используем промежуточный handleSubmit,
+// чтобы:
+//   1) вызвать server action createIngredint(formData);
+//   2) потом локально очистить форму в клиентском состоянии.
+
+// Кратко по смыслу:
+// formData: FormData в handleSubmit — это не твой useState, а браузерный FormData, который собрал <Form action={...}>.
+// createIngredint — server action, который Next 15 умеет вызывать прямо из action={...}.
+// Ты оборачиваешь его в свой handleSubmit, чтобы после сервера ещё и почистить локальный стейт (сбросить форму в UI).

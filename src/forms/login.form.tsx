@@ -23,7 +23,7 @@ const LoginForm = ({ onClose }: IProps) => {
     
     window.location.reload();
 
-    // закрываем моальное окно полсе регистрации
+    // закрываем модальное окно полсе регистрации
     onClose();
   };
 

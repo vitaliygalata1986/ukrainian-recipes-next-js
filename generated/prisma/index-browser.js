@@ -156,6 +156,17 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   expires: 'expires'
 };
 
+exports.Prisma.IngredientScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  category: 'category',
+  unit: 'unit',
+  pricePerUnit: 'pricePerUnit',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -170,13 +181,29 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.Category = exports.$Enums.Category = {
+  VEGETABLES: 'VEGETABLES',
+  FRUITS: 'FRUITS',
+  MEAT: 'MEAT',
+  DAIRY: 'DAIRY',
+  SPICES: 'SPICES',
+  OTHER: 'OTHER'
+};
 
+exports.Unit = exports.$Enums.Unit = {
+  GRAMS: 'GRAMS',
+  KILOGRAMS: 'KILOGRAMS',
+  LITERS: 'LITERS',
+  MILLILITERS: 'MILLILITERS',
+  PIECES: 'PIECES'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',
   Account: 'Account',
   Session: 'Session',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  Ingredient: 'Ingredient'
 };
 
 /**

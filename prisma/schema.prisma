@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client-js" // можно оставить "prisma-client", но так рекомендует Prisma
-  output   = "../generated/prisma"
+  provider = "prisma-client-js" 
 }
 
 datasource db {
@@ -90,7 +89,7 @@ enum Unit{
   GRAMS
   KILOGRAMS
   LITERS
-  MILLILITESR
+  MILLILITERS
   PIECES
 }
 

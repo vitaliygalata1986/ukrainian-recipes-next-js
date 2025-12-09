@@ -1,10 +1,10 @@
 export const CATEGORY_OPTIONS = [
-  { value: 'VEGETABLES', label: 'Усі' },
-  { value: 'FRUITS', label: 'Китайська' },
-  { value: 'MEAT', label: 'Iталійська' },
-  { value: 'DAIRY', label: 'Японська' },
-  { value: 'SPICES', label: 'Французька' },
-  { value: 'OTHER', label: 'Бельгійська' },
+  { value: 'VEGETABLES', label: 'Овочі' },
+  { value: 'FRUITS', label: 'Фрукти' },
+  { value: 'MEAT', label: 'М’ясо' },
+  { value: 'DAIRY', label: 'Молочні продукти' },
+  { value: 'SPICES', label: 'Спеції' },
+  { value: 'OTHER', label: 'Інше' },
 ] as const;
 
 export const UNIT_OPTIONS = [
