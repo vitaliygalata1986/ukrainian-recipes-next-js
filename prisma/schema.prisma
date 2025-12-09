@@ -62,3 +62,67 @@ model VerificationToken {
   @@unique([identifier, token])
   @@map("verification_tokens")
 }
+
+model Ingredient {
+  id            String    @id @default(uuid())
+  name          String
+  category      Category
+  unit          Unit
+  pricePerUnit  Float?
+  description   String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("ingredients")
+}
+
+enum Category{
+  VEGETABLES
+  FRUITS
+  MEAT
+  DAIRY
+  SPICES
+  OTHER
+}
+
+enum Unit{
+  GRAMS
+  KILOGRAMS
+  LITERS
+  MILLILITESR
+  PIECES
+}
+
+
+
+//  id  String @id @default(uuid()) - будет генерироваться с помощью уникального uuid
+/*
+  enum делает сразу три полезные вещи:
+  1. Ограничивает значения в БД
+  Для поля:
+  category Category
+  Prisma при миграции в PostgreSQL создаст enum-тип в базе, что-то вроде:
+  CREATE TYPE "Category" AS ENUM ('VEGETLES', 'FRUITS', 'MEAT', 'DAIRY', 'SPICES', 'OTHER');
+  И колонка category в таблице ingredients сможет принимать только одно из этих значений.
+  То есть ты не сможешь случайно записать "VEGTEBLES" или "veg" — база не пропустит.
+  2. Явная доменная модель
+  enum явно говорит: "category может быть только одним из фиксированных вариантов", а не любая строка.
+  Это:
+    делает модель данных понятнее
+    упрощает работу на фронте (можно мапить enum → label)
+    удобно для форм/селектов — список категорий централизован в одном месте.
+      Например, на фронте ты можешь сделать:
+        export const CATEGORY_OPTIONS = [
+          { value: 'VEGETABLES', label: 'Овочі' },
+          { value: 'FRUITS', label: 'Фрукти' },
+          ...
+        ];
+      И это будет синхронизировано с Prisma enum.
+      Чем это лучше обычного String?
+      Если бы ты написал: category String
+      то:
+        можно записать в БД что угодно: "vegetable", "veg", "овощ", "VEG", "VEGETABLES" — полный хаос;
+        нет автодополнения в коде;
+        валидация ложится полностью на твои руки (и фронт, и бэк).  
+*/

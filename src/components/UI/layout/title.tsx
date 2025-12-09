@@ -19,7 +19,7 @@ const Title = () => {
   // console.log(pageTitle); // О нас
 
   return (
-    <div className="w-full flex justify-center mt-6 mb-12">
+    <div className="w-full flex justify-center my-6">
       <h1 className="text-3xl font-bold">{pageTitle}</h1>
     </div>
   );
