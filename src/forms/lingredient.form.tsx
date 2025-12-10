@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { Input, Select, SelectItem, Button, Form } from '@heroui/react'; // Form убрали
 import { CATEGORY_OPTIONS, UNIT_OPTIONS } from '@/constants/select-options';
 import { createIngredint } from '@/actions/ingredient';
@@ -17,20 +17,28 @@ const IngredientForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState(initialState);
 
-  const handleSubmit = async (formData: FormData) => {
-    const result = await createIngredint(formData);
-    // formData здесь — не наш локальный стейт,
-    // а объект FormData, который собрал HeroUI Form из всех полей (name="...").
-    // Мы просто прокидываем его в server action createIngredint.
+  const [isPending, startTransition] = useTransition(); // позволяет управлять отложенными обновлениями состояния
+  // isPending - это булево значение, которое указывает, находится ли переход в ожидании.
+  // startTransition - это функция, которая позволяет пометить обновление состояния как переход.
 
-    if (result.error) {
-      setError(result.error);
-    } else {
-      setError(null);
-      // После успешного сохранения очищаем локальное состояние,
-      // чтобы сбросить значения инпутов в UI.
-      setFormData(initialState);
-    }
+  const handleSubmit = async (formData: FormData) => {
+    startTransition(async () => {
+      const result = await createIngredint(formData);
+      // formData здесь — не наш локальный стейт,
+      // а объект FormData, который собрал HeroUI Form из всех полей (name="...").
+      // Мы просто прокидываем его в server action createIngredint.
+
+      if (result.error) {
+        setError(result.error);
+        alert('Помилка при створенні інгредієнта');
+      } else {
+        setError(null);
+        // После успешного сохранения очищаем локальное состояние,
+        // чтобы сбросить значения инпутов в UI.
+        setFormData(initialState);
+        alert('Інгредієнт успішно створено');
+      }
+    });
   };
 
   return (
@@ -154,7 +162,7 @@ const IngredientForm = () => {
       />
 
       <div className="flex w-full justify-end items-center">
-        <Button className="primary" type="submit">
+        <Button className="primary" type="submit" isLoading={isPending}>
           Додати інгредієнт
         </Button>
       </div>
