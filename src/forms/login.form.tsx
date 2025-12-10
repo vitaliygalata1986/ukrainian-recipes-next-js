@@ -9,6 +9,9 @@ interface IProps {
 }
 
 const LoginForm = ({ onClose }: IProps) => {
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -17,14 +20,22 @@ const LoginForm = ({ onClose }: IProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // console.log('Form submitted:', formData);
 
-    await signInWithCredentials(formData.email, formData.password);
-    
-    window.location.reload();
+    const result = await signInWithCredentials(
+      formData.email,
+      formData.password
+    );
 
-    // закрываем модальное окно полсе регистрации
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      setError(result.error ?? null);
+      return;
+    }
+
+    // успех: можно закрыть модалку и обновить страницу
     onClose();
+    window.location.reload();
   };
 
   return (
@@ -63,6 +74,8 @@ const LoginForm = ({ onClose }: IProps) => {
           return null;
         }}
       />
+
+      {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
 
       <div className="flex w-[100%] justify-end gap-4 items-center pt-4">
         <Button variant="light" onPress={onClose}>
