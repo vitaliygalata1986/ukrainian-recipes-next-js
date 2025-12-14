@@ -7,7 +7,10 @@ export async function middleware(request: NextAuthRequest) {
   // console.log(pathname); // about || ingredients
   // мы не можем здесь использовать isAuth так как midlleware исполняется на уровне сервера
   // поэтому будем вытаскивать jwt токен из куки
-  const token = await getToken({ req: request });
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET,
+  });
   // дальше определим массив, содержащий защищённые роуты
   const protectedRoutes = ['/ingredients'];
   if (protectedRoutes.some((route) => pathname.startsWith(route))) {
