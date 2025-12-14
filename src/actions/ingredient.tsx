@@ -41,6 +41,31 @@ export async function createIngredint(formData: FormData) {
   }
 }
 
+// функция для получения всех ингредиентов из базы данных и отправки их на клиент
+export async function getIngredients() {
+  try {
+    // обращаексь к базе данных через prisma client и получаем все ингредиенты, используя метод findMany (ingredient - это модель в нашей базе данных)
+    const ingredients = await prisma.ingredient.findMany();
+    return { success: true, ingredients };
+  } catch (error) {
+    console.error('Error fetching ingredients:', error);
+    return { error: 'Error fetching ingredients' };
+  }
+}
+
+// удаление ингредиента по id
+export async function deleteIngredient(id: string) {
+  try {
+    const ingredient = await prisma.ingredient.delete({
+      where: { id }, // удаляем по id, where - условие удаления
+    });
+    return { success: true, ingredient };
+  } catch (error) {
+    console.error('Error deleting ingredient:', error);
+    return { error: 'Error deleting ingredient' };
+  }
+}
+
 /*
   as в TypeScript — это оператор приведения типа (type assertion).
   Он говорит компилятору: «поверь мне, я знаю, что тут именно такой тип». 

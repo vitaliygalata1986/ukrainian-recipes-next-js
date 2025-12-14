@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useIngredientStore } from '@/store/ingredient.store';
 import { Input, Select, SelectItem, Button, Form } from '@heroui/react'; // Form убрали
 import { CATEGORY_OPTIONS, UNIT_OPTIONS } from '@/constants/select-options';
-import { createIngredint } from '@/actions/ingredient';
 
 const initialState = {
   name: '',
@@ -16,6 +16,7 @@ const initialState = {
 const IngredientForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState(initialState);
+  const { addIngredient } = useIngredientStore();
 
   const [isPending, startTransition] = useTransition(); // позволяет управлять отложенными обновлениями состояния
   // isPending - это булево значение, которое указывает, находится ли переход в ожидании.
@@ -23,26 +24,27 @@ const IngredientForm = () => {
 
   const handleSubmit = async (formData: FormData) => {
     startTransition(async () => {
-      const result = await createIngredint(formData);
+      await addIngredient(formData);
       // formData здесь — не наш локальный стейт,
       // а объект FormData, который собрал HeroUI Form из всех полей (name="...").
       // Мы просто прокидываем его в server action createIngredint.
+      const storeError = useIngredientStore.getState().error; // Получаем ошибку из Zustand store после попытки добавления ингредиента.
 
-      if (result.error) {
-        setError(result.error);
-        alert('Помилка при створенні інгредієнта');
+      if (storeError) {
+        setError(storeError);
+        // alert('Помилка при створенні інгредієнта');
       } else {
         setError(null);
         // После успешного сохранения очищаем локальное состояние,
         // чтобы сбросить значения инпутов в UI.
         setFormData(initialState);
-        alert('Інгредієнт успішно створено');
+        // alert('Інгредієнт успішно створено');
       }
     });
   };
 
   return (
-    <Form className="w-[400px]" action={handleSubmit}>
+    <Form className="w-full" action={handleSubmit}>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <Input
         isRequired

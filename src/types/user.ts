@@ -1,4 +1,4 @@
-import { prisma } from './prisma';
+import { prisma } from '../utils/prisma';
 
 export async function getUserFromDb(email: string) {
   // Импортируем prisma внутри функции, чтобы избежать циклических зависимостей

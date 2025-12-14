@@ -56,25 +56,34 @@ export default function Header() {
 
   const getNavItems = () => {
     {
-      return siteConfig.navItems.map((item) => {
-        const isActive = item.href === pathname;
-        return (
-          <NavbarItem key={item.href}>
-            <Link
-              color="foreground"
-              href={item.href}
-              className={`px-3 py-1  
+      return siteConfig.navItems
+        .filter((item) => {
+          // если пользователь навигирует на страницу ингредиентов, показываем этот пункт меню только если он авторизован
+          // тоесть страница попадет в false и не отрендерится (тоесть не попадет в mapping)
+          if (item.href === '/ingredients') {
+            return isAuth;
+          }
+          return true;
+        })
+        .map((item) => {
+          const isActive = item.href === pathname;
+          return (
+            <NavbarItem key={item.href}>
+              <Link
+                color="foreground"
+                href={item.href}
+                className={`px-3 py-1  
                 ${isActive ? 'text-blue-500' : 'text-white'}
                hover:text-blue-300 hover:border
                hover:border-blue-300 rounded-md
                  transition-all duration-200
                 `}
-            >
-              {item.label}
-            </Link>
-          </NavbarItem>
-        );
-      });
+              >
+                {item.label}
+              </Link>
+            </NavbarItem>
+          );
+        });
     }
   };
 
