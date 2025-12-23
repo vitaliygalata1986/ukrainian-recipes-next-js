@@ -69,6 +69,7 @@ model Ingredient {
   unit          Unit
   pricePerUnit  Float?
   description   String?
+  recipes       RecipeIngredient[] // связь с моделью RecipeIngredient
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -91,6 +92,29 @@ enum Unit{
   LITERS
   MILLILITERS
   PIECES
+}
+
+model Recipe {
+  id            String    @id @default(uuid())
+  name          String
+  description   String?
+  imageUrl      String?   @map("image_url")
+  ingredients   RecipeIngredient[] // связь с моделью RecipeIngredient
+
+  @@map("recipes")
+}
+
+// эта модель связывает рецепты и ингредиенты (многие ко многим) тоесть один рецепт может иметь много ингредиентов и один ингредиент может быть в многих рецептах
+
+model RecipeIngredient {
+  id           String     @id @default(uuid())
+  recipe       Recipe     @relation(fields: [recipeId], references: [id])
+  recipeId     String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  ingredientId String
+  quantity     Float
+
+  @@map("recipe_ingredients")
 }
 
 
@@ -124,4 +148,11 @@ enum Unit{
         можно записать в БД что угодно: "vegetable", "veg", "овощ", "VEG", "VEGETABLES" — полный хаос;
         нет автодополнения в коде;
         валидация ложится полностью на твои руки (и фронт, и бэк).  
+*/
+
+
+/*
+  в PostgreSQL не появится отдельная “колонка recipes” в таблице ingredients и не появится “колонка ingredients” в таблице recipes.
+  recipes RecipeIngredient[] и ingredients RecipeIngredient[] — это виртуальные поля Prisma (relation fields). 
+  Они существуют в Prisma-схеме и в Prisma Client, чтобы ты мог удобно делать include, select, джоины и т.д., но не хранятся как столбцы.
 */
