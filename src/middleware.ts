@@ -12,8 +12,12 @@ export async function middleware(request: NextAuthRequest) {
     secret: process.env.AUTH_SECRET,
   });
   // дальше определим массив, содержащий защищённые роуты
-  const protectedRoutes = ['/ingredients'];
-  if (protectedRoutes.some((route) => pathname.startsWith(route))) {
+  const protectedRoutes = ['/ingredients', '/recipes/new', '/recipes/:path*'];
+  if (
+    protectedRoutes.some(
+      (route) => pathname.startsWith(route.replace(':path*', '')) // проверяем, начинается ли путь с одного из защищённых роутов
+    )
+  ) {
     // проверяем, начинается ли путь с одного из защищённых роутов
     // если токена нет в куках, редиректим на главную
     if (!token) {
@@ -30,5 +34,5 @@ export async function middleware(request: NextAuthRequest) {
 
 // объявим конфиг для middleware
 export const config = {
-  matcher: ['/ingredients'], // указываем пути, на которые будет срабатывать middleware
+  matcher: ['/ingredients', '/recipes/new', '/recipes/:path*'], // указываем пути, на которые будет срабатывать middleware
 };

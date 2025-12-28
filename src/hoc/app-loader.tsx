@@ -2,6 +2,7 @@
 
 import { useAuthStore } from '@/store/auth.store';
 import { useIngredientStore } from '@/store/ingredient.store';
+import { useRecipeStore } from '@/store/recipe.store';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 
@@ -13,6 +14,7 @@ const AppLoader = ({ children }: IProps) => {
   const { data: session, status } = useSession();
   const { isAuth, setAuthState } = useAuthStore();
   const { loadIngredients } = useIngredientStore();
+  const { loadRecipes } = useRecipeStore();
 
   useEffect(() => {
     setAuthState(status, session); // устанавливаем состояние
@@ -21,6 +23,10 @@ const AppLoader = ({ children }: IProps) => {
   useEffect(() => {
     loadIngredients();
   }, [isAuth, loadIngredients]);
+
+  useEffect(() => {
+    loadRecipes();
+  }, [loadRecipes]);
 
   return <>{children}</>;
 };
