@@ -7,7 +7,7 @@ interface AuthState {
   isAuth: boolean;
   status: SessionStatus;
   session: Session | null; // внутри store будем хранить саму сессию которую получаем из next-auth (сессия )
-  setAuthState: (status: SessionStatus, session: Session | null) => void; // метод установки состояния в наш store
+  setAuthState: (status: SessionStatus, session?: Session | null) => void; // метод установки состояния в наш store
 }
 
 // метод set - позволяет обновлять состояние стора
@@ -17,7 +17,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuth: false,
   status: 'loading',
   session: null,
-  setAuthState: (status, session) =>
+  setAuthState: (status, session = null) =>
     // в stor устанавливаем новое состояние
     set(() => ({
       isAuth: status === 'authenticated', // если статус аутентифицирован, то isAuth будет true
