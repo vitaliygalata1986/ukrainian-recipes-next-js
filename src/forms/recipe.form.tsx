@@ -23,12 +23,11 @@ const initialState = {
   imageUrl: '',
 };
 
-type FormData = typeof initialState;
 
 const RecipeForm = ({ initialRecipe }: RecipeFormProps) => {
   const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     name: initialRecipe?.name || initialState.name,
     description: initialRecipe?.description || initialState.description,
     imageUrl: initialRecipe?.imageUrl || initialState.imageUrl,
