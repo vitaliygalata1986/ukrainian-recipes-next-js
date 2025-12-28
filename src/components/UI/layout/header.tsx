@@ -13,7 +13,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import RegistrationModal from '../modals/registration.modal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LoginModal from '../modals/login.modal';
 import { signOutFunc } from '@/actions/sign-out';
 import { useAuthStore } from '@/store/auth.store';
@@ -37,6 +37,10 @@ export default function Header() {
   // console.log(pathname);
 
   const { isAuth, session, status, setAuthState } = useAuthStore();
+
+  useEffect(() => {
+    setAuthState(status, session);
+  }, [status, session, setAuthState]);
 
   // проверим статус сессии
   // const isAuth = status === 'authenticated';
