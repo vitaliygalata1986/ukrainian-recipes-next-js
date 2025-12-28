@@ -17,7 +17,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuth: false,
   status: 'loading',
   session: null,
-  setAuthState: (status: SessionStatus, session: Session | null) =>
+  setAuthState: (status, session) =>
     // в stor устанавливаем новое состояние
     set(() => ({
       isAuth: status === 'authenticated', // если статус аутентифицирован, то isAuth будет true
