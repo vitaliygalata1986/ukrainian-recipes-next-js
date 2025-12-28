@@ -1,4 +1,4 @@
-import { getToken } from 'next-auth/jwt';
+import { getToken, GetTokenParams } from 'next-auth/jwt';
 import { NextAuthRequest } from 'next-auth';
 import { NextResponse } from 'next/server';
 
@@ -7,10 +7,20 @@ export async function middleware(request: NextAuthRequest) {
   // console.log(pathname); // about || ingredients
   // мы не можем здесь использовать isAuth так как midlleware исполняется на уровне сервера
   // поэтому будем вытаскивать jwt токен из куки
-  const token = await getToken({
+
+  let params: GetTokenParams = {
     req: request,
-    secret: process.env.AUTH_SECRET,
-  });
+    secret: process.env.AUTH_SECRET ?? 'secret',
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    params = {
+      ...params,
+      cookieName: '__Secure-next-auth.session-token',
+    };
+  }
+
+  const token = await getToken(params); // получаем токен из куки
   // дальше определим массив, содержащий защищённые роуты
   const protectedRoutes = ['/ingredients', '/recipes/new', '/recipes/:path*'];
   if (
