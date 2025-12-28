@@ -1,3 +1,4 @@
+/*
 import type { Session } from 'next-auth';
 import { create } from 'zustand';
 
@@ -24,4 +25,31 @@ export const useAuthStore = create<AuthState>((set) => ({
       status, // после этого перезаписываем статус на authenticated
       session, // и сохраняем сессию, которую мы получали из useSession
     })),
+}));
+*/
+
+import { create } from 'zustand';
+import type { Session } from 'next-auth';
+
+export type SessionStatus = 'authenticated' | 'unauthenticated' | 'loading';
+type SessionValue = Session | null;
+
+interface AuthState {
+  isAuth: boolean;
+  status: SessionStatus;
+  session: SessionValue;
+  setAuthState: (status: SessionStatus, session?: SessionValue) => void;
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  isAuth: false,
+  status: 'loading',
+  session: null,
+
+  setAuthState: (status: SessionStatus, session: SessionValue = null) =>
+    set({
+      isAuth: status === 'authenticated',
+      status,
+      session,
+    }),
 }));

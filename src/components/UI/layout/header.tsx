@@ -38,10 +38,6 @@ export default function Header() {
 
   const { isAuth, session, status, setAuthState } = useAuthStore();
 
-  useEffect(() => {
-    setAuthState(status, session);
-  }, [status, session, setAuthState]);
-
   // проверим статус сессии
   // const isAuth = status === 'authenticated';
 
